@@ -1,40 +1,45 @@
 import React, { Component } from 'react';
 import { givePasswordName } from './Api';
 import auth from './Auth';
+import { connect } from 'react-redux';
+import { changeHandler, loginVerification } from '../actions';
 
 export class LoginFollow extends Component {
-	state = {
-		passWord: '',
-		unAuthAlert: false
-	};
-
 	changeHandler = (e) => {
-		this.setState({ [e.target.name]: e.target.value });
+		this.props.dispatch(
+			changeHandler({
+				[e.target.name]: e.target.value
+			})
+		);
 	};
 
 	submitHandler = async (e) => {
 		e.preventDefault();
+		const { userName, password } = this.props.changeHandler;
 		const user = await givePasswordName({
-			userName: this.props.userName,
-			passWord: this.state.passWord
+			userName: userName,
+			password: password
 		});
+
 		if (user.message === 'Authenticated') {
 			auth.secondLogin(() => {
 				this.props.history.push('/dashboard');
 			}, user);
 		} else {
-			this.setState({ unAuthAlert: true });
+			this.props.dispatch(loginVerification({ unAuthAlert: true }));
 		}
 	};
 
 	render() {
+		const { userName } = this.props.changeHandler;
+		const { unAuthAlert } = this.props.verification;
 		return (
 			<form
-				autoComplete='off'
+				autoComplete='on'
 				onSubmit={this.submitHandler}
 				className='flex flex-col w-64 bg-transparent mx-auto my-auto'
 			>
-				{this.state.unAuthAlert ? (
+				{unAuthAlert ? (
 					<p className='text-white'>
 						Username or password not correct
 					</p>
@@ -43,14 +48,14 @@ export class LoginFollow extends Component {
 					type='text'
 					name='userName'
 					required
-					value={this.props.userName}
+					value={userName}
 					placeholder='userName'
-					onChange={this.props.changeHandler}
+					onChange={this.changeHandler}
 					className='border-gray-400 border-solid border rounded-sm my-2 p-2 '
 				/>
 				<input
 					type='password'
-					name='passWord'
+					name='password'
 					required
 					placeholder='Password'
 					onChange={this.changeHandler}
@@ -67,4 +72,9 @@ export class LoginFollow extends Component {
 	}
 }
 
-export default LoginFollow;
+const mapStateToProps = (state) => ({
+	changeHandler: state.changeHandler,
+	verification: state.verification
+});
+
+export default connect(mapStateToProps)(LoginFollow);

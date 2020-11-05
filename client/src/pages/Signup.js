@@ -2,42 +2,61 @@ import React, { Component } from 'react';
 import { createAccount } from '../components/Api';
 import auth from '../components/Auth';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { changeHandler, signupVerification } from '../actions';
 
 export class Signup extends Component {
 	state = {
-		email: '',
-		userName: '',
-		passWord: '',
-		confirmPassWord: '',
-		isTaken: false,
-		Inconsistent: false,
 		eye: false
 	};
 
 	changeHandler = (e) => {
-		this.setState({ [e.target.name]: e.target.value });
+		this.props.dispatch(
+			changeHandler({
+				[e.target.name]: e.target.value
+			})
+		);
 	};
 
 	submitHandler = async (e) => {
 		e.preventDefault();
-		const signUpCredentials = await createAccount(this.state);
+		const {
+			userName,
+			password,
+			email,
+			confirmPassword
+		} = this.props.changeHandler;
+		const signUpCredentials = await createAccount({
+			email: email,
+			userName: userName,
+			password: password,
+			confirmPassword: confirmPassword
+		});
+
 		const { message } = signUpCredentials;
-		console.log(signUpCredentials);
+
 		if (message === 'created') {
-			this.setState({ isTaken: false, Inconsistent: false });
+			this.props.dispatch(
+				signupVerification({ isTaken: false, Inconsistent: false })
+			);
 			auth.signup(() => {
 				this.props.history.push('/dashboard');
 			});
 		} else {
-			this.setState({
-				isTaken: message.taken,
-				Inconsistent: message.inconsistency
-			});
+			this.props.dispatch(
+				signupVerification({
+					isTaken: message.taken,
+					Inconsistent: message.inconsistency
+				})
+			);
 		}
 	};
 
 	render() {
 		const { eye } = this.state;
+		const { isTaken, Inconsistent } = this.props.verification;
+		//console.log(Inconsistent);
+
 		return (
 			<div className='min-w-screen min-h-screen bg-blue-900 flex flex-col'>
 				<div className='flex justify-end flex-grow-0'>
@@ -53,12 +72,12 @@ export class Signup extends Component {
 						onSubmit={this.submitHandler}
 						className='flex flex-col w-64 bg-transparent mx-auto my-auto'
 					>
-						{this.state.isTaken ? (
+						{isTaken ? (
 							<p className='text-white'>
 								Username or email is taken
 							</p>
 						) : null}
-						{this.state.Inconsistent ? (
+						{Inconsistent ? (
 							<p className='text-white'>
 								passwords are not consistent
 							</p>
@@ -83,8 +102,8 @@ export class Signup extends Component {
 						/>
 						<div className='relative w-64 h-11'>
 							<input
-								type={eye ? 'text' : 'passWord'}
-								name='passWord'
+								type={eye ? 'text' : 'password'}
+								name='password'
 								required
 								placeholder='password'
 								onChange={this.changeHandler}
@@ -101,8 +120,8 @@ export class Signup extends Component {
 							></i>
 						</div>
 						<input
-							type={eye ? 'text' : 'passWord'}
-							name='confirmPassWord'
+							type={eye ? 'text' : 'password'}
+							name='confirmPassword'
 							required
 							placeholder='Confirm Password'
 							onChange={this.changeHandler}
@@ -121,4 +140,9 @@ export class Signup extends Component {
 	}
 }
 
-export default Signup;
+const mapStateToProps = (state) => ({
+	changeHandler: state.changeHandler,
+	verification: state.verification
+});
+
+export default connect(mapStateToProps)(Signup);

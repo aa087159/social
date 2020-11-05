@@ -6,7 +6,7 @@ import Signup from './pages/Signup';
 import User from './pages/User';
 import Error from './pages/Error';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import './styles/app.css';
+import './main.css';
 
 const App = () => {
 	return (
@@ -15,7 +15,7 @@ const App = () => {
 				<Route path='/login' exact component={Login} />
 				<Route path='/signup' exact component={Signup} />
 				<ProtectedRoute path='/dashboard' exact component={Dashboard} />
-				<Route path='/:userID' exact component={User} />
+				<Route path='/user/:userName' exact component={User} />
 				<Route component={Error} />
 			</Switch>
 		</Router>

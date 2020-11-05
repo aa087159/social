@@ -3,31 +3,34 @@ import { giveUserName } from '../components/Api';
 import auth from '../components/Auth';
 import { Link } from 'react-router-dom';
 import LoginFollow from '../components/LoginFollow';
+import { connect } from 'react-redux';
+import { changeHandler, loginVerification } from '../actions';
 
 export class Login extends Component {
-	state = {
-		userName: '',
-		isUserAuthenticated: false,
-		unAuthAlert: false
-	};
-
 	changeHandler = (e) => {
-		this.setState({ [e.target.name]: e.target.value });
+		this.props.dispatch(
+			changeHandler({
+				[e.target.name]: e.target.value
+			})
+		);
 	};
 
 	submitHandler = async (e) => {
 		e.preventDefault();
-		const { userName } = this.state;
+		const { userName } = this.props.changeHandler;
 		const user = await giveUserName(userName);
 		if (user.message === 'Authenticated') {
-			this.setState({ isUserAuthenticated: true });
+			this.props.dispatch(
+				loginVerification({ isUserAuthenticated: true })
+			);
 		} else {
-			this.setState({ unAuthAlert: true });
+			this.props.dispatch(loginVerification({ unAuthAlert: true }));
 		}
 		auth.firstLogin(user);
 	};
 
 	render() {
+		const { isUserAuthenticated, unAuthAlert } = this.props.verification;
 		return (
 			<div className='min-w-screen min-h-screen bg-blue-900 flex flex-col'>
 				<div className='flex justify-end flex-grow-0'>
@@ -39,13 +42,13 @@ export class Login extends Component {
 				</div>
 
 				<div className='flex-grow flex justify-center'>
-					{!this.state.isUserAuthenticated ? (
+					{!isUserAuthenticated ? (
 						<form
 							//autoComplete='off'
 							className='flex flex-col w-64 bg-transparent mx-auto my-auto'
 							onSubmit={this.submitHandler}
 						>
-							{this.state.unAuthAlert ? (
+							{unAuthAlert ? (
 								<p className='text-white'>
 									Username Does Not Exist
 								</p>
@@ -67,7 +70,6 @@ export class Login extends Component {
 						</form>
 					) : (
 						<LoginFollow
-							userName={this.state.userName}
 							history={this.props.history}
 							changeHandler={this.changeHandler}
 						/>
@@ -78,4 +80,9 @@ export class Login extends Component {
 	}
 }
 
-export default Login;
+const mapStateToProps = (state) => ({
+	changeHandler: state.changeHandler,
+	verification: state.verification
+});
+
+export default connect(mapStateToProps)(Login);
