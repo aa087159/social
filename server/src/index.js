@@ -364,26 +364,6 @@ app.post('/api/followUser', (req, res) => {
 	});
 });
 
-// app.get('/api/getComments', (req, res) => {
-// 	client.connect((error) => {
-// 		if (error) throw error;
-// 		const db = client.db(dbName);
-// 		const postsCollection = db.collection(
-// 			req.headers.userName || 'aa087159'
-// 		);
-
-// 		postsCollection
-// 			.find({})
-// 			.project({ comments: 1, _id: 0 })
-// 			.sort({ 'comments.date': 1 })
-// 			.toArray(async (err, result) => {
-// 				console.log(result);
-
-// 				res.json(result);
-// 			});
-// 	});
-// });
-
 const port = process.env.SERVER_PORT || 5002;
 app.listen(port, () => {
 	console.log(`Listening at http://localhost:${port}`);

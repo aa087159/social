@@ -4,7 +4,7 @@ let form = {
 	password: '',
 	confirmPassword: '',
 	text: '',
-	title: ''
+	title: '',
 };
 
 export const changeHandler = (state = form, action) => {
@@ -12,7 +12,7 @@ export const changeHandler = (state = form, action) => {
 		case 'CHANGE_FORM':
 			return {
 				...state,
-				[action.name]: action.value || state[action.name]
+				[action.name]: action.value,
 			};
 		default:
 			return state;
@@ -20,3 +20,4 @@ export const changeHandler = (state = form, action) => {
 };
 
 export default changeHandler;
+//[action.name]: action.value || state[action.name]

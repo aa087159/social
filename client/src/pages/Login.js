@@ -10,7 +10,7 @@ export class Login extends Component {
 	changeHandler = (e) => {
 		this.props.dispatch(
 			changeHandler({
-				[e.target.name]: e.target.value
+				[e.target.name]: e.target.value,
 			})
 		);
 	};
@@ -82,7 +82,7 @@ export class Login extends Component {
 
 const mapStateToProps = (state) => ({
 	changeHandler: state.changeHandler,
-	verification: state.verification
+	verification: state.verification,
 });
 
 export default connect(mapStateToProps)(Login);

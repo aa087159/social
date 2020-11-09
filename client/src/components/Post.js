@@ -22,16 +22,18 @@ export class Post extends Component {
 	iconClick = async (e) => {
 		const { userName } = this.props.changeHandler;
 		const { _id } = this.props.post;
+		const functionOfButton = e.currentTarget.id;
 
-		if (e.currentTarget.id === 'heartCount') {
-			this.setState({ heart: !this.state.heart });
+		if (functionOfButton === 'heartCount') {
 			if (!this.state.heart) {
+				this.setState({ heart: !this.state.heart });
 				await updatePost({
 					userName: userName,
 					id: _id,
 					update: 'plus',
 				});
 			} else {
+				this.setState({ heart: !this.state.heart });
 				await updatePost({
 					userName: userName,
 					id: _id,
@@ -40,7 +42,7 @@ export class Post extends Component {
 			}
 		}
 
-		if (e.currentTarget.id === 'commentCount') {
+		if (functionOfButton === 'commentCount') {
 			this.setState({ commentModule: !this.state.commentModule });
 		}
 		await getPosts(userName).then((posts) => {
@@ -78,21 +80,17 @@ export class Post extends Component {
 
 		const { userName } = this.props.changeHandler;
 		const gradient = {
-			borderImage: this.props.isText
-				? 'linear-gradient(#a6c0fe, #f68084) 0 100%'
-				: null,
-			backgroundColor: '#f2f2f2',
+			// borderImage: this.props.isText
+			// 	? 'linear-gradient(#a6c0fe, #f68084) 0 100%'
+			// 	: null,
 		};
 		return (
-			<div className='user flex min-w-screen '>
-				<div className='user'>
+			<>
+				<div className='user-info'>
 					<p>{userName}</p>
 				</div>
 
-				<div
-					className=' p-4  my-4 flex-grow shadow-md rounded-lg border-l-20'
-					style={gradient}
-				>
+				<div className='post-content' style={gradient}>
 					<div className='post-top flex '>
 						<p>{this.props.post.userName}</p>
 						<div className='neumorph-container ml-auto'>
@@ -178,6 +176,7 @@ export class Post extends Component {
 								type='text'
 								placeholder='add a comment...'
 								value={this.state.comment}
+								required
 								onChange={(e) => {
 									this.setState({ comment: e.target.value });
 								}}
@@ -187,7 +186,7 @@ export class Post extends Component {
 					</div>
 					{this.state.commentModule ? <div>open</div> : null}
 				</div>
-			</div>
+			</>
 		);
 	}
 }
